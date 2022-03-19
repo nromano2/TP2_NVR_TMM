@@ -38,6 +38,7 @@ tail(df)
 ##
 #Processing and Cleaning Dataframe
 ##
+# Dropped duplicated students by certain variables
 df<-df[!duplicated(df[ , c("school","sex","age","address","famsize",
                            "Pstatus","Medu","Fedu","Mjob","Fjob",
                            "reason","nursery","internet")]), ]
@@ -59,6 +60,7 @@ df$address[df$address=="R"] <- "Rural"
 df$Pstatus[df$Pstatus=="A"] <- "Living Apart"
 df$Pstatus[df$Pstatus=="T"] <- "Living Together"
 
+colnames(df)
 #Dropping columns by assignning a subset of the columns that we decided to keep
 df<- df[c("subject", "school", "sex", "age", "address", 
           "Pstatus", "Medu", "Fedu", "traveltime", "studytime", 
@@ -83,6 +85,7 @@ tail(df)
 
 dim(df)
 
+# Funvtion to check for the missing values for a fiven function, then using a for loop to return the missing columns for each of the columns
 missing_values <- function(x){
   na_values <- sum(is.na(x))
   return(na_values)
@@ -96,6 +99,12 @@ for (x in colnames(df)){
 }
 
 str(df)
+
+#
+##Summary Statistics
+#
+
+#Summary Statistics of the continous data within the dataset
 
 #Creating the correlation matrix, its heatmap and saving it
 continuous_columns <- df[c("age", "failures", "absences", "period1_grade", "period2_grade", "final_grade")]
@@ -120,7 +129,7 @@ categorical_columns <- df[c("subject", "school", "sex", "address", "Pstatus", "M
 
 head(categorical_columns)
 
-
+#value_stats function returns a table that contians the value count and value frequency for a given column
 value_stats <- function(x){
   table1 <- table(df[x])
   table2 <- prop.table(table(df[x]))
@@ -276,7 +285,7 @@ ordinal_graphs <- function(columnname, overall_title,  title1, title1_size, titl
           axis.title = element_text(size = axis_size)) +
     scale_y_continuous(breaks = seq(0, 20, by=2))+
     xlab(labelx) +
-    ylab(label_y1)
+    ylab(label_y2)
   
   figure8_box3 <- ggplot(data=df) +
     geom_boxplot(mapping=aes(x=factor(columnname), y=final_grade), fill=fill_value) +
@@ -285,7 +294,7 @@ ordinal_graphs <- function(columnname, overall_title,  title1, title1_size, titl
           axis.title = element_text(size = axis_size)) +
     scale_y_continuous(breaks = seq(0, 20, by=2))+
     xlab(labelx) +
-    ylab(label_y1)
+    ylab(label_y3)
   
   figure8 <- (figure8_bar + figure8_box1 + figure8_box2 + figure8_box3) +
     plot_annotation(title = overall_title)
