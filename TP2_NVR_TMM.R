@@ -85,7 +85,7 @@ tail(df)
 
 dim(df)
 
-# Funvtion to check for the missing values for a fiven function, then using a for loop to return the missing columns for each of the columns
+#Function to check for the missing values for a given column, then using a for loop to return the missing columns for each of the columns
 missing_values <- function(x){
   na_values <- sum(is.na(x))
   return(na_values)
@@ -104,9 +104,9 @@ str(df)
 ##Summary Statistics
 #
 
-#Summary Statistics of the continous data within the dataset
+#Summary Statistics of the continuous data within the data set
 
-#Creating the correlation matrix, its heatmap and saving it
+#Creating the correlation matrix, its heat map and saving it
 continuous_columns <- df[c("age", "failures", "absences", "period1_grade", "period2_grade", "final_grade")]
 summary(continuous_columns)
 
@@ -115,11 +115,13 @@ print(correlation_matrix)
 correlation_matrix <- melt(correlation_matrix)
 print(correlation_matrix)
 
-ggplot(data = correlation_matrix, aes(x=Var1, y=Var2, fill=value)) + 
-  geom_tile(color="white") + 
+figure1 <- ggplot(data = correlation_matrix, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile(color="black") + 
+  scale_fill_distiller(palette = "Reds", direction = +1)+
   ggtitle("Correlation Matrix Heat Map")
+figure1
 
-ggsave("correlation_matrix", plot = last_plot(), device = "png")
+ggsave("correlation_matrix", plot = figure1, device = "png")
 
 #Value Frequency and Proportions of Categorical Columns
 categorical_columns <- df[c("subject", "school", "sex", "address", "Pstatus", "M_edu", "F_edu", 
@@ -129,7 +131,7 @@ categorical_columns <- df[c("subject", "school", "sex", "address", "Pstatus", "M
 
 head(categorical_columns)
 
-#value_stats function returns a table that contians the value count and value frequency for a given column
+#value_stats function returns a table that contains the value count and value frequency for a given column
 value_stats <- function(x){
   table1 <- table(df[x])
   table2 <- prop.table(table(df[x]))
@@ -143,7 +145,12 @@ for (x in colnames(categorical_columns)){
   print(lapply(x, value_stats))
 }
 
+##
+#Data Set Graphical Exploration
+##
 
+#Distribution Graphs
+#Grade Distribution
 grade1 <- ggplot(data=df, aes(x=period1_grade)) + 
   geom_histogram(color="black", fill="blue", binwidth = 1) +
   scale_x_continuous(breaks = seq(0, 20, by=1)) +
@@ -166,6 +173,7 @@ figure2 <- grade1 / grade2 / grade3 +
 figure2
 ggsave("grade_distributions", plot = figure2, device = "png")
 
+#Age Distribution
 figure3 <- ggplot(data=df, aes(x=age)) + 
   geom_histogram(color="black", fill="blue", binwidth = 1) +
   scale_x_continuous(breaks = seq(15, 23, by=1)) +
@@ -173,6 +181,7 @@ figure3 <- ggplot(data=df, aes(x=age)) +
 figure3  
 ggsave("age_distributions", plot = figure3, device = "png")
 
+#Absences Distribution
 figure4 <- ggplot(data=df, aes(x=absences)) + 
   geom_histogram(color="black", fill="blue", binwidth = 1) +
   scale_x_continuous(breaks = seq(0, 80, by=10)) +
@@ -180,14 +189,15 @@ figure4 <- ggplot(data=df, aes(x=absences)) +
 figure4
 ggsave("absences_distributions", plot = figure4, device = "png")
 
-
+#Failure Distribution
 figure5 <-  ggplot(data=df, aes(x=failures)) + 
   geom_histogram(color="black", fill="blue", binwidth = 1) +
   ggtitle("Failures Distibutions")
 figure5
 ggsave("failures_distributions", plot = figure5, device = "png")
 
-
+#Scatterplots
+#Grade by Course Scatterplot
 grades1_2 <- ggplot(data=df) +
   geom_point(mapping = aes(x=period1_grade, y=period2_grade), color="blue") +
   xlab("Period 1 Grade") +
@@ -219,6 +229,7 @@ figure6 <- (grades1_2 + grades1_3 + grades2_3) +
 figure6 
 ggsave("grade_scatterplot", plot = figure6, device = "png")
 
+#Bar Charts and Boxplots
 nominal_graphs <- function(columnname, overall_title, title1, title1_size, title2, title2_size, title3, title3_size, title4, title4_size, labelx, label_y1, label_y2, label_y3, axis_size, fill_value){
   figure7_bar <- ggplot(data=df) +
     geom_bar(mapping=aes(x=columnname), fill="blue") +
@@ -256,7 +267,8 @@ nominal_graphs <- function(columnname, overall_title, title1, title1_size, title
     ylab(label_y3)
   
   figure7 <- (figure7_bar + figure7_box1 + figure7_box2 + figure7_box3) +
-    plot_annotation(title = overall_title)
+    plot_annotation(title = overall_title, 
+                    theme = theme(plot.title = element_text(hjust = 0.5)))
   return(figure7)
 }
 
@@ -297,7 +309,8 @@ ordinal_graphs <- function(columnname, overall_title,  title1, title1_size, titl
     ylab(label_y3)
   
   figure8 <- (figure8_bar + figure8_box1 + figure8_box2 + figure8_box3) +
-    plot_annotation(title = overall_title)
+    plot_annotation(title = overall_title, 
+                    theme = theme(plot.title = element_text(hjust = 0.5)))
   
   return(figure8)
 }
@@ -314,35 +327,35 @@ student_parent_status <- nominal_graphs(df$Pstatus, "Student Parent Status", "St
 student_parent_status
 ggsave("student_parentstatus", plot = student_parent_status, device = "png")
 
-mother_education_level <- ordinal_graphs(df$M_edu, "Mother Educational Level", "Student Count by Mother Educational Level", 7, "Period 1 Grade by Mother Educational Level", 7, "Period 2 Grade by Mother Educational Level", 7, "Final Grade by Mother Educational Level", 7, "Educational Level", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
+mother_education_level <- ordinal_graphs(df$M_edu, "Mother Educational Level", "Student Count by Mother Educational Level", 8, "Period 1 Grade by Mother Educational Level", 8, "Period 2 Grade by Mother Educational Level", 8, "Final Grade by Mother Educational Level", 8, "Educational Level", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
 mother_education_level
 ggsave("m_education", plot = mother_education_level, device = "png")
 
-father_education_level <- ordinal_graphs(df$F_edu, "Father Educational Level", "Student Count by Father Educational Level", 7, "Period 1 Grade by Father Educational Level", 7, "Period 2 Grade by Father Educational Level", 7, "Final Grade by Father Educational Level", 7, "Educational Level", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
+father_education_level <- ordinal_graphs(df$F_edu, "Father Educational Level", "Student Count by Father Educational Level", 8, "Period 1 Grade by Father Educational Level", 8, "Period 2 Grade by Father Educational Level", 8, "Final Grade by Father Educational Level", 8, "Educational Level", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
 father_education_level
 ggsave("f_education", plot = father_education_level, device = "png")
 
-student_traveltime <- ordinal_graphs(df$traveltime, "Student Travel Time", "Student Count by Travel Time", 7, "Period 1 Grade by Travel Time", 7, "Period 2 Grade by Travel Time", 7, "Final Grade by Travel Time", 7, "Travel Time", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red"))
+student_traveltime <- ordinal_graphs(df$traveltime, "Student Travel Time", "Student Count by Travel Time", 9, "Period 1 Grade by Travel Time", 9, "Period 2 Grade by Travel Time", 9, "Final Grade by Travel Time", 9, "Travel Time", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red"))
 student_traveltime
 ggsave("student_traveltime", plot = student_traveltime, device = "png")
 
 
-student_studytime <- ordinal_graphs(df$studytime, "Student Study Time", "Student Count by Study Time", 7, "Period 1 Grade by Study Time", 7, "Period 2 Grade by Study Time", 7, "Final Grade by Study Time", 7, "Study Time", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red"))
+student_studytime <- ordinal_graphs(df$studytime, "Student Study Time", "Student Count by Study Time", 9, "Period 1 Grade by Study Time", 9, "Period 2 Grade by Study Time", 9, "Final Grade by Study Time", 9, "Study Time", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red"))
 student_studytime
 ggsave("student_studytime", plot = student_studytime, device = "png")
 
 
-school_support <- nominal_graphs(df$schoolsup, "Student School Educational Support", "Student Count by School Educational Support", 7, "Period 1 Grade by School Educational Support", 7, "Period 2 Grade by School Educational Support", 7, "Final Grade by School Educational Support", 7, "School Educational Support", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("orange", "steelblue"))
+school_support <- nominal_graphs(df$schoolsup, "Student School Educational Support", "Student Count by School Educational Support", 8, "Period 1 Grade by School Educational Support", 8, "Period 2 Grade by School Educational Support", 8, "Final Grade by School Educational Support", 8, "School Educational Support", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("orange", "steelblue"))
 school_support
 ggsave("student_schoolsupport", plot = school_support, device = "png")
 
 
-family_support <- nominal_graphs(df$famsup, "Student Family Educational Support", "Student Count by Family Educational Support", 7, "Period 1 Grade by Family Educational Support", 7, "Period 2 Grade by Family Educational Support", 7, "Final Grade by Family Educational Support", 7,"Family Educational Support", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange"))
+family_support <- nominal_graphs(df$famsup, "Student Family Educational Support", "Student Count by Family Educational Support", 9, "Period 1 Grade by Family Educational Support", 9, "Period 2 Grade by Family Educational Support", 9, "Final Grade by Family Educational Support", 9,"Family Educational Support", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange"))
 family_support
 ggsave("student_familysupport", plot = family_support, device = "png")
 
 
-extra_classes <- nominal_graphs(df$paid, "Extra Classes Paid", "Student Count by Those Who Paid for Extra Classes", 6, "Period 1 Grade by Those Who Paid for Extra Classes", 6, "Period 2 Grade by Those Who Paid for Extra Classes", 6, "Final Grade by Those Who Paid for Extra Classes", 6,"Paid for Extra Classes", "Period 1 Grade", "Period 2 Grade", "Final Grade", 6, c("steelblue", "orange"))
+extra_classes <- nominal_graphs(df$paid, "Extra Classes Paid", "Student Count by Those Who Paid for Extra Classes", 8, "Period 1 Grade by Those Who Paid for Extra Classes", 8, "Period 2 Grade by Those Who Paid for Extra Classes", 8, "Final Grade by Those Who Paid for Extra Classes", 8,"Paid for Extra Classes", "Period 1 Grade", "Period 2 Grade", "Final Grade", 6, c("steelblue", "orange"))
 extra_classes
 ggsave("student_paid", plot = extra_classes, device = "png")
 
@@ -364,32 +377,32 @@ internet_access
 ggsave("student_internetaccess", plot = internet_access, device = "png")
 
 
-family_relationships <- ordinal_graphs(df$famrel, "Quality of Family Relationships", "Student Count by Quality of Family Relationships", 7, "Period 1 Grade by Quality of Family Relationships", 7, "Period 2 Grade by Quality of Family Relationships", 7, "Final Grade by Quality of Family Relationships", 7, "Quality of Family Relationships", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
+family_relationships <- ordinal_graphs(df$famrel, "Quality of Family Relationships", "Student Count by Quality of Family Relationships", 8, "Period 1 Grade by Quality of Family Relationships", 8, "Period 2 Grade by Quality of Family Relationships", 8, "Final Grade by Quality of Family Relationships", 8, "Quality of Family Relationships", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
 family_relationships
 ggsave("student_familyrelationships", plot = family_relationships, device = "png")
 
 
-student_freetime <- ordinal_graphs(df$freetime, "Amount of Free Time", "Student Count by Amount of Free Time", 7, "Period 1 Grade by Amount of Free Time", 7, "Period 2 Grade by Amount of Free Time", 7, "Final Grade by Amount of Free Time", 7, "Amount of Free Time", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
+student_freetime <- ordinal_graphs(df$freetime, "Amount of Free Time", "Student Count by Amount of Free Time", 9, "Period 1 Grade by Amount of Free Time", 9, "Period 2 Grade by Amount of Free Time", 9, "Final Grade by Amount of Free Time", 9, "Amount of Free Time", "Period 1 Grade", "Period 2 Grade", "Final Grade", 8, c("steelblue", "orange", "dark green", "dark red", "purple"))
 student_freetime
 ggsave("student_freetime", plot = student_freetime, device = "png")
 
 
-student_timespentout <- ordinal_graphs(df$goout, "Time Spent Out with Friends", "Student Count by Time Spent Out with Friendsl", 7, "Period 1 Grade by Time Spent Out with Friends", 7, "Period 2 Grade by Time Spent Out with Friends", 7, "Final Grade by Time Spent Out with Friends", 7, "Time Spent Out with Friends", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
+student_timespentout <- ordinal_graphs(df$goout, "Time Spent Out with Friends", "Student Count by Time Spent Out with Friends", 8, "Period 1 Grade by Time Spent Out with Friends", 8, "Period 2 Grade by Time Spent Out with Friends", 8, "Final Grade by Time Spent Out with Friends", 8, "Time Spent Out with Friends", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
 student_timespentout
 ggsave("student_goout", plot = student_timespentout, device = "png")
 
 
-weekday_alc <- ordinal_graphs(df$weekday_alc, "Student Weekday Alcohol Consumption", "Student Count by Weekday Alcohol Consumption", 7, "Period 1 Grade by Weekday Alcohol Consumption", 7, "Period 2 Grade by Weekday Alcohol Consumption", 7, "Final Grade by Weekday Alcohol Consumption", 7, "Weekday Alcohol Consumption", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
+weekday_alc <- ordinal_graphs(df$weekday_alc, "Student Weekday Alcohol Consumption", "Student Count by Weekday Alcohol Consumption", 8, "Period 1 Grade by Weekday Alcohol Consumption", 8, "Period 2 Grade by Weekday Alcohol Consumption", 8, "Final Grade by Weekday Alcohol Consumption", 8, "Weekday Alcohol Consumption", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
 weekday_alc
 ggsave("student_weekdayalc", plot = weekday_alc, device = "png")
 
 
-weekend_alc <- ordinal_graphs(df$weekend_alc, "Student Weekend Alcohol Consumption", "Student Count by Weekend Alcohol Consumption", 7, "Period 1 Grade by Weekend Alcohol Consumption", 7, "Period 2 Grade by Weekend Alcohol Consumption", 7, "Final Grade by Weekend Alcohol Consumption", 7, "Weekend Alcohol Consumption", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
+weekend_alc <- ordinal_graphs(df$weekend_alc, "Student Weekend Alcohol Consumption", "Student Count by Weekend Alcohol Consumption", 8, "Period 1 Grade by Weekend Alcohol Consumption", 8, "Period 2 Grade by Weekend Alcohol Consumption", 8, "Final Grade by Weekend Alcohol Consumption", 8, "Weekend Alcohol Consumption", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
 weekend_alc
 ggsave("student_weekendalc", plot = weekend_alc, device = "png")
 
 
-health_status <- ordinal_graphs(df$health, "Health Status", "Student Count by Health Status", 7, "Period 1 Grade by Health Status", 7, "Period 2 Grade by Health Status", 7, "Final Grade by Health Status", 7, "Health Status", "Period 1 Grade", "Period 2 Grade", "Final Grade", 7, c("steelblue", "orange", "dark green", "dark red", "purple"))
+health_status <- ordinal_graphs(df$health, "Health Status", "Student Count by Health Status", 9, "Period 1 Grade by Health Status", 9, "Period 2 Grade by Health Status", 9, "Final Grade by Health Status", 9, "Health Status", "Period 1 Grade", "Period 2 Grade", "Final Grade", 8, c("steelblue", "orange", "dark green", "dark red", "purple"))
 health_status
 ggsave("health_status", plot = health_status, device = "png")
 
